@@ -1,6 +1,6 @@
 # TP3 : Listes Chaînées - RAPPORT (Version Corrigée)
 
-**Auteur:** MASSON  
+**Auteur:** MORAND Killian 
 **Date:** 15 Novembre 2024  
 **Cours:** Structures de Données - E4FR
 
