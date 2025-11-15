@@ -1,0 +1,104 @@
+TP3 : Listes¶
+Listes de Elmt_t¶
+Vous allez écrire une librairie de gestion de liste chaînée comme vu en cours (mais pas tout à fait). Pour cela commencez par créer six fichiers :
+
+elmt_t.h
+elmt_t.c
+list.h
+list.c
+test.c
+Makefile
+elmt_t.h / elmt_c¶
+Dans elmt_t.h
+
+Définir un type Elmt_t comme étant un int.
+Déclarer les fonctions :
+void print_int( int * e); permet d'afficher un int passé par adresse.
+int compare_int( int * e1, int * e2); renvoie :
+un nombre négatif si la valeur pointée par e1 est inférieur à celle pointée par e2
+0 si les deux valeurs sont identiques
+un nombre positif si la valeur pointée par e1 est supérieur à celle pointée par e2
+Elmt_t * new_elmt(Elmt_t e); :
+Alloue dynamiquement un Elmt_t
+Copie à l'adresse obtenue la valeur e
+Retourne l'adresse obtenue ou NULL en cas d'erreur d'allocation
+void free_elmt(Elmt_t * e); libère la mémoire associée à un Elmt_t passé par adresse
+Dans elmt_t.c, définissez les fonctions de elmt_t.h
+
+list.h / list.c¶
+Pour l'instant les listes ne sont pas supposées triées.
+
+Dans le fichier List.h :
+
+Définir le type Cell (pas tout à fait) comme vu en cours
+un pointeur vers un Elmt_t data
+un pointeur next vers une autre Cell
+Définir le type List comme un pointeur de Cell
+Vous allez maintenant déclarer dans list.h et définir dans list.c les fonctions suivantes (fonctions de bases vues en cours). Pour l'instant on ne touche pas à test.c, par contre après avoir écrit chaque fonction, on vérifie que le code compile avant de passer à la fonction suivante.
+
+int is_empty(List l); renvoie 1 si la liste est vide, 0 sinon
+List create_empty_list(); renvoie une liste vide
+void print_list(List l, void (*print_elmt)( Elmt_t *)); Affiche les éléments d'une liste (grâce a la fonction passée en paramètre), séparés par des ,. Le premier élément est précédé d'un [ et le dernier par un ]. Si la liste est vide, la fonction affiche donc []. Vous testerez en passant a la fonction la fonction print_int demandée au début du sujet (types compatibles ssi Elmt_t est défini comme un int).
+Cell* create_cell(Elmt_t * n);
+Alloue dynamiquement une Cell
+L'initialise avec l'adresse du Elmt_t passée en paramètre et avec la valeur NULL pour le pointeur next.
+Renvoie l'adresse de la nouvelle cellule ou NULL en cas de problème d'allocation
+void free_cell(Cell* c); libère la mémoire associée à une cellule
+Cell* insert_first(Elmt_t* n, List* l);
+Appelle create_cell et ajoute la cellule obtenue en tête de liste
+Retourne l'adresse de la nouvelle cellule (donc la liste) ou NULL en cas de problème d'allocation
+void free_list(List* l); libère la mémoire associée à une liste et positionne la valeur passée par adresse à NULL
+A ce stade, vous devez écrire une fonction main() dans test.c et tester vos fonctions. Lorsque tout est OK, ajoutez les fonctions suivantes (vous testerez au fur et à mesure) :
+
+Cell* insert_last(Elmt_t* n, List* l);
+Appelle create_cell et ajoute la cellule obtenue en queue de liste
+Retourne l'adresse de la nouvelle cellule (donc la liste) ou NULL en cas de problème d'allocation
+Notes :
+insert_last et insert_first se comportent de la même manière en cas de liste vide
+insérer en fin revient à insérer après le dernier élément. Ce n'est pas différent que d'insérer après un élément quelconque. Vous pouvez donc commencer par écrire la fonction void insert_after(Cell* new_cell, Cell* previous); qui insère la cellule new_cell après la cellule previous. Cette fonction suppose que ni new_cell ni previous ne sont NULL. Écrire ensuite insert_last consiste à rechercher le dernier élément, si celui ci est NULL, appeler insert_first, sinon créer la cellule et appeler insert_after.
+Cell* search(Elmt_t * e, List l, int (*compare_elmt)(Elmt_t * e1, Elmt_t * e2)); Cherche e dans la liste l supposée non triée, en utilisant la fonction passée en paramètre pour tester les valeurs successives (vous utiliserez la fonction compare_int demandée au début du sujet pour tester)
+renvoie la première cellule qui le contient si présent
+NULL si absent de la liste
+int length(List l); renvoie la taille de la liste
+void concatenate(List * l1, List l2); concatène l1 et l2 (ajoute le premier élément de l2 à la fin de l1)
+void mirror_it(List * l); inverse une liste chaînée sans recopier ses éléments, de façon itérative.
+void mirror_rec(List * l); inverse une liste chaînée sans recopier ses éléments, de façon récursive.
+Cell* search_k(int k, List l); retourne la kieme cellule de la liste ou NULL si elle n'existe pas
+int sorted_search(Elmt_t * e, List l, Cell** res, int (*compare_elmt)(Elmt_t * e1, Elmt_t * e2)); Cherche e dans la liste l supposée triée, en utilisant la fonction passée en paramètre pour tester les valeurs successives (vous utiliserez la fonction compare_int demandée au début du sujet pour tester)
+renvoie 1 si l'élément est présent, 0 sinon
+res est l'adresse d'un pointeur de cellule qui est passé à la fonction. La fonction va modifier ce pointeur (d'où la double indirection)
+si la fonction renvoie 1, res pointera sur la cellule contenant l'élément recherché
+sinon res pointera sur le dernier maillon de la liste contenant un élément plus petit que l'élément recherché (NULL si la liste ne contient que des éléments plus grands)
+int remove_cell(Cell* c, List * l); retire le maillon c de la liste (elle est passée par adresse au cas où c serait le premier élément). Lorsque vous testez, n'oubliez pas de libérer la mémoire du maillon enlevé (remove ne doit pas le faire). Renvoie 1 si l'eltmt c était bien une cellule de la liste, 0 sinon.
+List remove_all(List * l, Elmt_t * e, int (*compare_elmt)(Elmt_t * e1, Elmt_t * e2)); enlève toutes les occurrences de e dans la liste l et les ajoute à une nouvelle liste qui sera retournée.
+List cut_sup(List * l, Elmt_t * e, int (*compare_elmt)(Elmt_t * e1, Elmt_t * e2)); enlève tous les maillons avec une valeur supérieur à e et les ajoute à une nouvelle liste qui sera retournée.
+List cut_inf(List * l, Elmt_t * e, int (*compare_elmt)(Elmt_t * e1, Elmt_t * e2)); enlève tous les maillons avec une valeur inférieur à e et les ajoute à une nouvelle liste qui sera retournée.
+List canonicalyze(List l, int (*compare_elmt)(Elmt_t * e1, Elmt_t * e2)); enlève tous les doublons de la liste, construit une nouvelle liste avec tous les éléments retirés qui sera renvoyée (note cette fonction ne peut pas modifier la tete de liste, si doublon, c'est le doublon qui sera retiré).
+Tri (bonus)¶
+Implémentez un des algos de tris vu sur les tableaux avec votre liste. Dans le rapport, vous expliquerez si ce choix d'algorithme se préte bien aux listes ou pas.
+
+double_list.h / double_list.c¶
+Dans un nouveau répertoire, recopiez vos fichier en changeant le nom de list.h en double_list.h et list.c en double_list.c.
+
+Adaptez bien tous les includes dans les .c
+
+Modifiez ensuite la définition du type Cell pour que la structure contienne : * un pointeur vers un Elmt_t data * un pointeur next vers une autre Cell * un pointeur prev vers une autre Cell
+
+Le dernier maillon a un champ next qui vaut NULL et le premier maillon un champ prev qui vaut NULL.
+
+La liste est dite doublement chaînée. Adaptez toutes les fonctions (sauf mirror qui n'a plus d'intérêt).
+
+FIFO et Piles¶
+Dans votre rapport, vous expliquerez pour chacun des cas suivants la complexité des opérations d'ajout et de retrait, ce qu'il faut éventuellement modifier par rapport à l'implémentation faite dans les TP2 et TP3, ce que l'on peut envisager pour réduire la complexité (par exemple pour les listes, passage à une liste doublement chainée, ajout d'un pointeur supplémentaire dans le type liste...), et les avantages et inconvénients de cette implémentation.
+
+implémentation d'une pile avec un tableau, ajout et retrait au début
+implémentation d'une pile avec un tableau, ajout et retrait en fin
+implémentation d'une pile avec une liste, ajout et retrait au début
+implémentation d'une pile avec une liste, ajout et retrait en fin
+
+implémentation d'une FIFO avec un tableau, ajout au début et retrait en fin
+
+implémentation d'une FIFO avec un tableau, ajout en fin et retrait au début
+implémentation d'une FIFO avec une liste, ajout au début et retrait en fin
+implémentation d'une FIFO avec une liste, ajout en fin et retrait au début
+Avant de conclure, vous pouvez vous poser la question de l'implémentation d'une file d'attente avec des priorités : quelle structure de données vous semble la plus appropriée et pourquoi ?
