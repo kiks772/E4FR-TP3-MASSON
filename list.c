@@ -145,12 +145,13 @@ void concatenate(List *l1, List l2)
 
 static void _mirror_rec_helper(Cell *current, Cell **prev)
 {
+	Cell *next;
+
 	if (current == NULL)
 		return;
-	_mirror_rec_helper(current->next, prev);
-	if (*prev != NULL)
-		(*prev)->next = current;
-	current->next = NULL;
+	next = current->next;
+	_mirror_rec_helper(next, prev);
+	current->next = *prev;
 	*prev = current;
 }
 

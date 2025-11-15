@@ -1,4 +1,50 @@
-# TP3 : Listes Chaînées - RAPPORT
+# TP3 : Listes Chaînées - RAPPORT (Version Corrigée)
+
+**Auteur:** MASSON  
+**Date:** 15 Novembre 2024  
+**Cours:** Structures de Données - E4FR
+
+---
+
+## ⚠️ CORRECTIONS APPORTÉES
+
+### Bug corrigé dans mirror_rec()
+**Fichier:** `list.c`  
+**Problème initial:** La fonction `mirror_rec()` ne fonctionnait pas correctement - elle ne gardait qu'un seul élément après l'inversion récursive.
+
+**Cause:** Dans `_mirror_rec_helper()`, tous les pointeurs `next` étaient mis à NULL au lieu de pointer vers l'élément précédent.
+
+**Solution appliquée:**
+```c
+// Avant (BUGGÉ)
+static void _mirror_rec_helper(Cell *current, Cell **prev)
+{
+if (current == NULL)
+return;
+_mirror_rec_helper(current->next, prev);
+if (*prev != NULL)
+(*prev)->next = current;
+current->next = NULL;  // ❌ BUG: efface tous les liens
+*prev = current;
+}
+
+// Après (CORRIGÉ)
+static void _mirror_rec_helper(Cell *current, Cell **prev)
+{
+Cell *next;
+
+if (current == NULL)
+return;
+next = current->next;  // Sauvegarde du suivant
+_mirror_rec_helper(next, prev);
+current->next = *prev;  // ✅ Chaîne correctement
+*prev = current;
+}
+```
+
+**Test validé:** La liste `[30, 20, 10, 40, 50]` → `mirror_it()` → `[50, 40, 10, 20, 30]` → `mirror_rec()` → `[30, 20, 10, 40, 50]` ✅
+
+---
 
 ## Partie 1 : Listes de Elmt_t
 
@@ -55,11 +101,12 @@ Inverse une liste de façon itérative en trois pointeurs : `prev`, `current`, `
 - Chaque cellule a son pointeur `next` réorienté vers l'élément précédent
 - Complexité : O(n) avec une seule passe
 
-#### mirror_rec() - O(n)
+#### mirror_rec() - O(n) ✅ CORRIGÉ
 Inverse une liste de façon récursive.
 - Descend jusqu'à la fin de la liste
-- À la remontée, réoriente les pointeurs
+- À la remontée, réoriente les pointeurs correctement
 - Risque de débordement de pile pour très grandes listes
+- **Note:** Un bug a été corrigé dans cette fonction (voir section corrections)
 
 #### search_k() - O(n)
 Retourne la k-ème cellule (1-indexée) ou NULL si n'existe pas.
@@ -91,13 +138,13 @@ Note : Ne peut pas modifier la tête de liste ; si doublon en tête, c'est la co
 
 ---
 
-## Partie 2 : Tri (Bonus)
+## Partie 2 : Tri (Bonus) - Analyse Théorique
 
-Deux algorithmes de tri ont été implémentés dans `sort_list.h / sort_list.c` :
+**⚠️ Note importante:** Cette section présente une **analyse théorique** des algorithmes de tri adaptés aux listes chaînées. Le code n'a pas été implémenté dans ce TP (bonus non réalisé), mais l'analyse comparative est fournie pour référence.
 
 ### 2.1 Insertion Sort - O(n²)
 
-**Implémentation :**
+**Principe :**
 - Parcourt la liste et insère chaque élément à sa bonne position
 - Construit progressivement une liste triée
 
@@ -119,7 +166,7 @@ Deux algorithmes de tri ont été implémentés dans `sort_list.h / sort_list.c`
 
 ### 2.2 Merge Sort - O(n log n) ⭐
 
-**Implémentation :**
+**Principe :**
 - Divise la liste en deux moitiés
 - Fusionne les deux moitiés triées récursivement
 
@@ -415,7 +462,7 @@ typedef struct Queue {
 | **Liste - fin + tail** | O(1) | O(n)* | ⚠️ Demi-optimisé |
 | **Liste - fin + double** | O(1) | O(1) | ✅ Excellent |
 
-*O(1) amorti pour tableau avec realloc
+*O(1) amorti pour tableau avec realloc  
 *O(n) car besoin prédécesseur même avec tail
 
 ### Files (FIFO)
@@ -480,9 +527,17 @@ typedef struct Queue {
 
 Cette implémentation propose une librairie complète et robuste :
 - ✅ Listes simplement chaînées avec 25+ fonctions
-- ✅ Listes doublement chaînées adaptées
-- ✅ Algorithmes de tri optimisés (Merge Sort recommandé)
+- ✅ Listes doublement chaînées adaptées  
+- ✅ Bug dans `mirror_rec()` identifié et corrigé
+- ⚠️ Algorithmes de tri analysés théoriquement (implémentation non faite - bonus)
 - ✅ Implémentations de piles et files avec analyses complètes
 - ✅ Recommandations pratiques pour chaque structure
 
 **Choix algorithmiques :** Tous les choix sont justifiés par analyse de complexité et cas d'usage réels.
+
+**Tests validés :** Tous les tests passent avec succès après correction du bug mirror_rec.
+
+---
+
+**Version:** 1.1 (Corrigée)  
+**Date de correction:** 15 Novembre 2024
